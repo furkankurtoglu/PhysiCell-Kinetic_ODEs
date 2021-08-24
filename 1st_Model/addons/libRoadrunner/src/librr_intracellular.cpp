@@ -120,7 +120,7 @@ void RoadRunnerIntracellular::initialize_intracellular_from_pugixml(pugi::xml_no
 }
 
 
-int RoadRunnerIntracellular::start()
+void RoadRunnerIntracellular::start()
 {
     // called when a new cell is created; creates the unique 'rrHandle'
     rrc::RRVectorPtr vptr;
@@ -143,9 +143,9 @@ int RoadRunnerIntracellular::start()
     // if (!rrc::loadSBML(rrHandle, "./config/Toy_SBML_Model_1.xml") )
     {
         std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
-        return -1;
+        // return -1;
         // 	printf ("Error message: %s\n", getLastError());
-        // 	exit (0);
+        exit (0);
     }
 
     // std::cout << "     rrHandle=" << rrHandle << std::endl;
@@ -183,7 +183,7 @@ int RoadRunnerIntracellular::start()
     }
     //std::cerr << "----------  end start() -------------\n";
 
-    return 0;
+    // return 0;
 }
 
 bool RoadRunnerIntracellular::need_update()
@@ -192,7 +192,7 @@ bool RoadRunnerIntracellular::need_update()
 }
 
 // solve the intracellular model
-int RoadRunnerIntracellular::update()
+void RoadRunnerIntracellular::update()
 {
     static double start_time = 0.0;
     static double end_time = 0.01;
@@ -253,7 +253,7 @@ int RoadRunnerIntracellular::update()
     // std::cout << "Saving last energy value (cell custom var) = " << result->Data[idx] << std::endl;
     // pCell->custom_data[energy_cell_idx]  = result->Data[idx];
 
-    return 0;
+    // return 0;
 }
 
 double RoadRunnerIntracellular::get_parameter_value(std::string param_name)
@@ -287,11 +287,12 @@ double RoadRunnerIntracellular::get_parameter_value(std::string param_name)
     // double res = this->result->Data[offset];
     double res = vptr->Data[offset];
     //std::cout << "    res = " << res << std::endl;
+    rrc::freeVector(vptr);
 	return res;
 }
 	
 // rwh: might consider doing a multi-[species_name, value] "set" method
-int RoadRunnerIntracellular::set_parameter_value(std::string species_name, double value)
+void RoadRunnerIntracellular::set_parameter_value(std::string species_name, double value)
 {
     rrc::RRVectorPtr vptr;
 
@@ -300,22 +301,25 @@ int RoadRunnerIntracellular::set_parameter_value(std::string species_name, doubl
     vptr->Data[idx] = value;
 	// rrc::setFloatingSpeciesConcentrations(pCell->phenotype.molecular.model_rr, vptr);
 	rrc::setFloatingSpeciesConcentrations(this->rrHandle, vptr);
-    return 0;
+    rrc::freeVector(vptr);
+    // return 0;
 }
 
 RoadRunnerIntracellular* getRoadRunnerModel(PhysiCell::Phenotype& phenotype) {
 	return static_cast<RoadRunnerIntracellular*>(phenotype.intracellular);
 }
 
-// void RoadRunnerIntracellular::save_PhysiBoSS(std::string path, std::string index)
-// {
+void RoadRunnerIntracellular::save_libRR(std::string path, std::string index)
+{
+	std::string state_file_name = path + "/states_" + index + ".dat";
 // 	std::string state_file_name = path + "/states_" + index + ".csv";
-// 	std::ofstream state_file( state_file_name );
-// 	state_file << "ID,state" << std::endl;
-// 	for( auto cell : *PhysiCell::all_cells )
-// 		state_file << cell->ID << "," << cell->phenotype.intracellular->get_state() << std::endl;
-// 	state_file.close();
-// }
+	std::ofstream state_file( state_file_name );
+	state_file << "---------  dummy output from save_libRR  ---------" << std::endl;
+	state_file << "ID,state" << std::endl;
+	for( auto cell : *PhysiCell::all_cells )
+		state_file << cell->ID << "," << cell->phenotype.intracellular->get_state() << std::endl;
+	state_file.close();
+}
 
 std::string RoadRunnerIntracellular::get_state()
 {
@@ -421,7 +425,7 @@ int RoadRunnerIntracellular::update_phenotype_parameters(PhysiCell::Phenotype& p
                 while ((pos = s.find(delimiter)) != std::string::npos) {
                     token = s.substr(0, pos);
                     //std::cout << counter << " : "<< token << std::endl;
-                    if (counter == 1);
+                    if (counter == 1)
                     {
                         start_index = atoi( token.c_str() );
                     }
@@ -578,7 +582,7 @@ int RoadRunnerIntracellular::validate_PhysiCell_tokens(PhysiCell::Phenotype& phe
                 int start_index;
                 while ((pos = s.find(delimiter)) != std::string::npos) {
                     token = s.substr(0, pos);
-                    if (counter == 1);
+                    if (counter == 1)
                     {
                         start_index = atoi( token.c_str() );
                     }

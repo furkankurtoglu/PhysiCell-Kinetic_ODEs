@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -671,9 +671,15 @@ Mechanics::Mechanics()
 	relative_maximum_adhesion_distance = 1.25; 
 	// maximum_adhesion_distance = 0.0; 
 	
+	
+	relative_maximum_attachment_distance = relative_maximum_adhesion_distance;
+	relative_detachment_distance = relative_maximum_adhesion_distance;
+	maximum_number_of_attachments = 12;
+	attachment_elastic_constant = 0.01; 
+	maximum_attachment_rate = 1.0; 
+	
 	return; 
 }
-
 
 // new on July 29, 2018
 // change the ratio without changing the repulsion strength or equilibrium spacing 
@@ -1018,8 +1024,6 @@ void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
 
 Cell_Functions::Cell_Functions()
 {
-	instantiate_cell = NULL;
-	
 	volume_update_function = NULL; 
 	update_migration_bias = NULL; 
 	
@@ -1033,9 +1037,6 @@ Cell_Functions::Cell_Functions()
 	set_orientation = NULL; 
 	
 	contact_function = NULL; 
-	
-	custom_adhesion = NULL;
-	custom_repulsion = NULL;
 
 /*	
 	internal_substrate_function = NULL; 
@@ -1057,12 +1058,23 @@ Phenotype::Phenotype()
 	flagged_for_removal = false; 
 	
 	// sync the molecular stuff here automatically? 
-	intracellular = NULL;  //rwh: review 
+	intracellular = NULL;
 	
 	return; 
 }
 
-void Phenotype::operator=(const Phenotype &p ) { 
+Phenotype::Phenotype(const Phenotype &p) {
+	intracellular = NULL;
+	*this = p;
+}
+
+Phenotype::~Phenotype() 
+{
+	if (intracellular != NULL)
+		delete intracellular;
+}
+
+Phenotype& Phenotype::operator=(const Phenotype &p ) { 
 		
 	flagged_for_division = p.flagged_for_division;
 	flagged_for_removal = p.flagged_for_removal;
@@ -1076,32 +1088,16 @@ void Phenotype::operator=(const Phenotype &p ) {
 	secretion = p.secretion;
 	
 	molecular = p.molecular;
+	
+	delete intracellular;
+	
 	if (p.intracellular != NULL)
-    {
 		intracellular = p.intracellular->clone();
-    }
+	else
+		intracellular = NULL;
+	
+	return *this;
 }
-	
-void Phenotype::operator=(Phenotype &p ) { 
-	
-	flagged_for_division = p.flagged_for_division;
-	flagged_for_removal = p.flagged_for_removal;
-	
-	cycle = p.cycle;
-	death = p.death;
-	volume = p.volume;
-	geometry = p.geometry;
-	mechanics = p.mechanics;
-	motility = p.motility;
-	secretion = p.secretion;
-	
-	molecular = p.molecular;
-	if (p.intracellular != NULL)
-    {
-		intracellular = p.intracellular->clone();
-    }
-}
-
 /*
 class Bools
 {
@@ -1140,5 +1136,3 @@ void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
 }
 
 };
-
-

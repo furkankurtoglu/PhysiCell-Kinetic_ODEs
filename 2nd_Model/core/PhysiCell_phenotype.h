@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -352,6 +352,7 @@ class Geometry
 
 class Mechanics
 {
+ private:
  public:
 	double cell_cell_adhesion_strength; 
 	double cell_BM_adhesion_strength;
@@ -362,6 +363,12 @@ class Mechanics
 	double relative_maximum_adhesion_distance; 
 	// double maximum_adhesion_distance; // needed? 
 	
+	double relative_maximum_attachment_distance; 
+	double relative_detachment_distance; 
+	
+	int maximum_number_of_attachments; 
+	double attachment_elastic_constant; 
+	double maximum_attachment_rate; 
 	
 	Mechanics(); // done 
 	
@@ -433,8 +440,6 @@ class Cell_Functions
 {
  private:
  public:
-	Cell* (*instantiate_cell)(); 
-
 	Cycle_Model cycle_model; 
 
 	void (*volume_update_function)( Cell* pCell, Phenotype& phenotype , double dt ); // used in cell 
@@ -453,8 +458,6 @@ class Cell_Functions
 	void (*contact_function)(Cell* pMyself, Phenotype& my_phenotype, 
 		Cell* pOther, Phenotype& other_phenotype, double dt ); 
 		
-	double (*custom_repulsion)(Cell* pCell, Cell* otherCell);
-	double (*custom_adhesion)(Cell* pCell, Cell* otherCell, double distance);
 	/* prototyping / beta in 1.5.0 */ 
 /*	
 	void (*internal_substrate_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
@@ -559,19 +562,19 @@ class Intracellular
 	virtual void initialize_intracellular_from_pugixml(pugi::xml_node& node) = 0;
 	
 	// This function initialize the model, needs to be called on each cell once created
-	virtual int start() = 0;
+	virtual void start() = 0;
 	
 	// This function checks if it's time to update the model
 	virtual bool need_update() = 0;
 
 	// This function update the model for the time_step defined in the xml definition
-	virtual int update() = 0;
+	virtual void update() = 0;
 
 	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
 	
 	// Set value for model parameter
-	virtual int set_parameter_value(std::string name, double value) = 0;
+	virtual void set_parameter_value(std::string name, double value) = 0;
 
 	virtual std::string get_state() = 0;  
 	
@@ -580,9 +583,11 @@ class Intracellular
 	
 
     // ================  specific to "maboss" ================
-	virtual bool has_node(std::string name) = 0; 
-	virtual bool get_boolean_node_value(std::string name) = 0;
-	virtual void set_boolean_node_value(std::string name, bool value) = 0;
+	virtual bool has_variable(std::string name) = 0; 
+	virtual bool get_boolean_variable_value(std::string name) = 0;
+	virtual void set_boolean_variable_value(std::string name, bool value) = 0;
+	// virtual bool get_double_variable_value(std::string name) = 0;
+	// virtual void set_double_variable_value(std::string name, bool value) = 0;
 	virtual void print_current_nodes() = 0;
 	
 
@@ -609,15 +614,16 @@ class Phenotype
 	Secretion secretion; 
 	
 	Molecular molecular; 
-	
-	// We need it to be a pointer to allow polymorphism
+
+    // We need it to be a pointer to allow polymorphism
 	// then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
 	Intracellular* intracellular;
 	
 	Phenotype(); // done 
-	
-	void operator=(const Phenotype &p );
-	void operator=(Phenotype &p );
+	Phenotype(const Phenotype &p);
+	~Phenotype();
+	Phenotype& operator=(const Phenotype &p );
+
 	void sync_to_functions( Cell_Functions& functions ); // done 
 	
 	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 

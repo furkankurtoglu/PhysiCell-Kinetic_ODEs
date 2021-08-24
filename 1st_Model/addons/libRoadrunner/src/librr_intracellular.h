@@ -14,8 +14,10 @@
 // #ifdef ADDON_ROADRUNNER
 // These are for C
 // #define STATIC_RRC
-#include "rrc_api.h"
-#include "rrc_types.h"
+// #include "rrc_api.h"
+// #include "rrc_types.h"
+#include "../roadrunner/include/rr/C/rrc_api.h"
+#include "../roadrunner/include/rr/C/rrc_types.h"
 // #include "rrc_utilities.h"
 extern "C" rrc::RRHandle createRRInstance();
 // #endif
@@ -79,13 +81,13 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	
 	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
 	
-    // Need 'int' return type to avoid bizarre compile errors.
-	int start();
+    // Need 'int' return type to avoid bizarre compile errors? But 'void' to match MaBoSS.
+	void start();
 
 	bool need_update();
 
     // Need 'int' return type to avoid bizarre compile errors.
-	int update();
+	void update();
     
     
     int update_phenotype_parameters(PhysiCell::Phenotype& phenotype);
@@ -94,16 +96,16 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
     int create_custom_data_for_SBML(PhysiCell::Phenotype& phenotype);
 	
 	double get_parameter_value(std::string name);
-	int set_parameter_value(std::string name, double value);
+	void set_parameter_value(std::string name, double value);
 	
 	std::string get_state();
 
     // for now, define dummy methods for these in the abstract parent class
-    bool has_node(std::string name) { return false; }
-	bool get_boolean_node_value(std::string name) { return false; }
-	void set_boolean_node_value(std::string name, bool value)  {}
+    bool has_variable(std::string name) { return false; }
+	bool get_boolean_variable_value(std::string name) { return false; }
+	void set_boolean_variable_value(std::string name, bool value)  {}
     void print_current_nodes() {}
-	// static void save_PhysiBoSS(std::string path, std::string index);
+
 	static void save_libRR(std::string path, std::string index);
 };
 
