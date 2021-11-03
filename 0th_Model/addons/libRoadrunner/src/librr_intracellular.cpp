@@ -182,7 +182,7 @@ void RoadRunnerIntracellular::start()
         std::cerr << kdx << ") " << vptr->Data[kdx] << std::endl;
     }
     //std::cerr << "----------  end start() -------------\n";
-
+    rrc::freeVector(vptr);
     // return 0;
 }
 
@@ -288,7 +288,7 @@ double RoadRunnerIntracellular::get_parameter_value(std::string param_name)
     double res = vptr->Data[offset];
     //std::cout << "    res = " << res << std::endl;
     rrc::freeVector(vptr);
-	return res;
+    return res;
 }
 	
 // rwh: might consider doing a multi-[species_name, value] "set" method
@@ -300,7 +300,7 @@ void RoadRunnerIntracellular::set_parameter_value(std::string species_name, doub
     int idx = species_result_column_index[species_name];
     vptr->Data[idx] = value;
 	// rrc::setFloatingSpeciesConcentrations(pCell->phenotype.molecular.model_rr, vptr);
-	rrc::setFloatingSpeciesConcentrations(this->rrHandle, vptr);
+    rrc::setFloatingSpeciesConcentrations(this->rrHandle, vptr);
     rrc::freeVector(vptr);
     // return 0;
 }

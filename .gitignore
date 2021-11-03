@@ -1,0 +1,9 @@
+*.o
+unit-test-conservation.exe
+Makefile-backup
+*.exe
+cancer_immune_3D
+0th_Model/addons/libRoadrunner/roadrunner
+1st_Model/addons/libRoadrunner/roadrunner/
+2nd_Model/addons/libRoadrunner/roadrunner/
+3d_Model/addons/libRoadrunner/roadrunner

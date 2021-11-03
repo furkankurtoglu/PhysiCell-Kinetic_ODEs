@@ -21,7 +21,7 @@ ymax = 50;
 
 Oxygen_Means = zeros(1,length(OutMatFiles));
 Glucose_Means = zeros(1,length(OutMatFiles));
-Energy_Means = zeros(1,length(OutMatFiles));
+Glutamine_Means = zeros(1,length(OutMatFiles));
 Lactate_Means = zeros(1,length(OutMatFiles));
 
 prev_time_point = 0;
@@ -47,15 +47,14 @@ for i = 1:length(OutMatFiles)
 
     celllist = (largeEnoughX & smallEnoughX & largeEnoughY & smallEnoughY);
     
-    Oxygen_mean = mean(MCDS.discrete_cells.custom.intra_oxy (celllist));
+
     Glucose_mean = mean(MCDS.discrete_cells.custom.intra_glu (celllist));
-    Energy_mean = mean(MCDS.discrete_cells.custom.intra_energy (celllist));
+    Glutamine_mean = mean(MCDS.discrete_cells.custom.intra_gln (celllist));
     Lactate_mean = mean(MCDS.discrete_cells.custom.intra_lac (celllist));
     
-    Oxygen_Means(i) = Oxygen_mean;
     Glucose_Means(i) = Glucose_mean;
     Lactate_Means(i) = Lactate_mean;
-    Energy_Means(i) = Energy_mean;
+    Glutamine_Means(i) = Glutamine_mean;
     
     time_interval = next_time_point - prev_time_point;
     
@@ -64,18 +63,15 @@ end
 time_points = time_points * time_interval;
 
 figure(1)
-plot(time_points,Energy_Means)
-title('Mean Energy')
+plot(time_points,Glutamine_Means)
+title('Mean Gln')
+
 
 figure(2)
-plot(time_points,Oxygen_Means)
-title('Mean Oxygen')
-
-figure(3)
 plot(time_points,Glucose_Means)
 title('Mean Glucose')
 
-figure(4)
+figure(3)
 plot(time_points,Lactate_Means)
 title('Mean Lactate')
 
