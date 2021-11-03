@@ -3,7 +3,11 @@ unit-test-conservation.exe
 Makefile-backup
 *.exe
 cancer_immune_3D
-0th_Model/addons/libRoadrunner/roadrunner
+0th_Model/addons/libRoadrunner/roadrunner/
 1st_Model/addons/libRoadrunner/roadrunner/
 2nd_Model/addons/libRoadrunner/roadrunner/
-3d_Model/addons/libRoadrunner/roadrunner
+3d_Model/addons/libRoadrunner/roadrunner/
+0th_Model/addons/libRoadrunner/roadrunner/roadrunner-win64-vs14-cp35m.zip
+1st_Model/addons/libRoadrunner/roadrunner/roadrunner-win64-vs14-cp35m.zip
+2nd_Model/addons/libRoadrunner/roadrunner/roadrunner-win64-vs14-cp35m.zip
+3d_Model/addons/libRoadrunner/roadrunner/roadrunner-win64-vs14-cp35m.zip
